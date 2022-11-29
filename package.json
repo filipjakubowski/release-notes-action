@@ -16,7 +16,9 @@
   "keywords": [
     "GitHub",
     "Actions",
-    "JavaScript"
+    "JavaScript",
+    "JIRA",
+    "release notes"
   ],
   "author": "",
   "license": "MIT",
@@ -25,7 +27,8 @@
   },
   "homepage": "https://github.com/actions/javascript-action#readme",
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "@bamboostick/git_release_notes": "^0.1.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.31.1",
