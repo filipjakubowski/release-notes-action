@@ -2688,19 +2688,10 @@ exports.default = _default;
 
 /***/ }),
 
-/***/ 258:
+/***/ 959:
 /***/ ((module) => {
 
-let wait = function (milliseconds) {
-  return new Promise((resolve) => {
-    if (typeof milliseconds !== 'number') {
-      throw new Error('milliseconds not a number');
-    }
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-};
-
-module.exports = wait;
+module.exports = eval("require")("@bamboostick/git_release_notes");
 
 
 /***/ }),
@@ -2835,20 +2826,16 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(186);
-const wait = __nccwpck_require__(258);
-
+const notes =  __nccwpck_require__(959);
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
-
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
+    console.log("Running ")
+    const notesString = notes.getReleaseNotesString("ab33640")
+    console.log("Notes: @bamboostick/git_release_notes");
+    console.log(notes);
+    core.setOutput('notes', notesString);
   } catch (error) {
     core.setFailed(error.message);
   }
