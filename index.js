@@ -8,8 +8,8 @@ async function run() {
     console.log("Running ")
 
     const payload = JSON.stringify(github.context.payload, undefined, 2)
-    const fromRef = github.context.base_ref;
-    const toRef = github.context.ref;
+    const fromRef = github.event.pull_request.merge_commit_sha;
+    const toRef = github.context.sha;
     const notesString = notes.releaseNotesString(fromRef, toRef);
     console.log("Notes: @bamboostick/git_release_notes");
     console.log(notesString);
