@@ -7,7 +7,8 @@ async function run() {
   try {
     console.log("Getting release notes: ");
     console.log(github.context);
-    console.log(github.context.payload.pull_request.base.sha);
+    console.log("base")
+    console.log(github.context.payload.pull_request.base);
     console.log(github.context.payload.before);
     console.log("-----------------");
     console.log(github.context.payload.after);
