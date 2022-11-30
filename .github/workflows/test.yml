@@ -25,8 +25,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    # Higher versions of checkout action are not working
     - uses: actions/checkout@v1
     - run: npm install
-    - uses: ./
-      id: getNotes
-    - run: echo ${{ steps.getNotes.outputs.notes }}
+    - name: Get Release Notes
+      uses: ./
+      id: notes
+    - run: |
+        echo ${{ steps.notes.outputs.notes }}
