@@ -9,8 +9,10 @@ async function run() {
   try {
     console.log("Getting release notes: ");
     console.log(github.context);
-    console.log("base")
+    console.log("\----------BASE-------------")
     console.log(github.context.payload.pull_request.base);
+    console.log("\----------HEAD-------------")
+    console.log(github.context.payload.pull_request.head);
     console.log(github.context.payload.before);
     console.log("-----------------");
 
