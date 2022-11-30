@@ -1,13 +1,5 @@
 name: 'Wait'
 description: 'Wait a designated number of milliseconds'
-inputs:
-  JIRA_URL:
-    description: "url to jour JIRA instance"
-  JIRA_USER:
-  JIRA_PASS_PWA:
-  JIRA_PROJECT_KEY:
-  IS_JIRA_SERVER:
-    description: "true | false - if this is cloud or server instance"
 outputs:
   notes: # output will be available to future steps
     description: 'Release Notes String'
