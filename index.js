@@ -6,6 +6,7 @@ const github = require('@actions/github');
 async function run() {
   try {
     console.log("Getting release notes: ");
+    console.log(github.context);
     const fromRef = github.context.payload.before;
     const toRef = github.context.payload.after;
     const notesString = notes.releaseNotesString(fromRef, toRef);
