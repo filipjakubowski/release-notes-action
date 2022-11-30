@@ -28,7 +28,7 @@
   "homepage": "https://github.com/actions/javascript-action#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@bamboostick/git_release_notes": "^0.1.1"
+    "@bamboostick/git_release_notes": "^0.1.8"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.31.1",
