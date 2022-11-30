@@ -37,6 +37,7 @@ async function run() {
     console.log("Notes: ");
     console.log(notesString);
     core.setOutput('notes', notesString);
+    core.setOutput('release', notesString.trim());
     core.setOutput('hello', 'World');
   } catch (error) {
     core.setFailed(error.message);

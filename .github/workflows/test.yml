@@ -33,4 +33,5 @@ jobs:
       id: notes
     - run: |
         echo ${{ steps.notes.outputs.hello }}
+        echo ${{ steps.notes.outputs.release }}
         echo ${{ steps.notes.outputs.notes }}
