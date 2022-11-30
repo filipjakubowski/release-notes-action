@@ -9,7 +9,7 @@ async function run() {
     console.log(github.context);
     const fromRef = github.context.payload.before;
     //const toRef = github.context.payload.after;
-    const toRef = github.context.payload.sha;
+    const toRef = github.context.sha;
     const notesString = notes.releaseNotesString(fromRef, toRef);
     console.log("Notes: ");
     console.log(notesString);
