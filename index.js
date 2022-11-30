@@ -8,13 +8,13 @@ import * as exec from "@actions/exec";
 async function run() {
   try {
      console.log("Getting release notes: ");
-  //   console.log(github.context);
-  //   console.log("\----------BASE-------------")
-  //   console.log(github.context.payload.pull_request.base);
-  //   console.log("\----------HEAD-------------")
-  //   console.log(github.context.payload.pull_request.head);
-  //   console.log(github.context.payload.before);
-  //   console.log("-----------------");
+    console.log(github.context);
+    console.log("\----------BASE-------------")
+    console.log(github.context.payload.pull_request.base);
+    console.log("\----------HEAD-------------")
+    console.log(github.context.payload.pull_request.head);
+    console.log(github.context.payload.before);
+    console.log("-----------------");
   //
   //
   //   console.log(github.context.payload.after);
@@ -37,8 +37,6 @@ async function run() {
     console.log("Notes: ");
     console.log(notesString);
     core.setOutput('notes', notesString);
-    core.setOutput('release', notesString.trim());
-    core.setOutput('hello', 'World');
   } catch (error) {
     core.setFailed(error.message);
   }
