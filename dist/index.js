@@ -3259,11 +3259,11 @@ class GitReleaseNotes {
         this.gitAdapter = gitAdapter;
         this.jiraAdapter = jiraAdapter;
     }
-    async getLogsFromSha(sha) {
-        return await this.gitAdapter.getCommitsSinceSha(sha);
+    async getLogsFromSha(fromSha, toSha) {
+        return await this.gitAdapter.getCommitsSinceSha(fromSha, toSha);
     }
-    async getNotesFromSha(sha) {
-        const gitCommits = await this.getLogsFromSha(sha);
+    async getNotesFromSha(fromSha, toSha) {
+        const gitCommits = await this.getLogsFromSha(fromSha, toSha);
         return gitCommits.filter(commit => {
             const matchResult = commit.title.match(this.jiraAdapter.getJIRARegexp());
             if (matchResult != null) {
@@ -3272,10 +3272,10 @@ class GitReleaseNotes {
             return matchResult != null;
         });
     }
-    async getNotesWithJira(sha) {
+    async getNotesWithJira(fromSha, toSha) {
         let commits = [];
         try {
-            commits = await this.getNotesFromSha(sha);
+            commits = await this.getNotesFromSha(fromSha, toSha);
         }
         catch (error) {
             console.log(error);
@@ -3285,8 +3285,8 @@ class GitReleaseNotes {
             return this.getNoteString(c);
         });
     }
-    async getNotesStringWithJira(sha) {
-        const notes = await this.getNotesWithJira(sha);
+    async getNotesStringWithJira(fromSha, toSha) {
+        const notes = await this.getNotesWithJira(fromSha, toSha);
         var notesString = "";
         notes.forEach(n => {
             notesString += n + "\n";
@@ -3361,28 +3361,30 @@ function gitLogToGitCommit(commitSting) {
     }
     return gc;
 }
-async function getCommits(sha) {
+async function getCommits(fromSha, toSha) {
     let commits = [];
     let buffer = "";
     let commitLines = [];
     const options = {
         listeners: {
             stdout: (data) => {
-                const newBuffer = buffer + data.toString();
-                buffer = "";
-                const bufferSplit = newBuffer.split("commit ");
-                // this entry might be not finished
-                buffer += "commit " + bufferSplit.pop();
-                bufferSplit.forEach(trimmedCommitLine => {
-                    commitLines.push("commit " + trimmedCommitLine);
-                });
+                if (data != undefined) {
+                    const newBuffer = buffer + data.toString();
+                    buffer = "";
+                    const bufferSplit = newBuffer.split("commit ");
+                    // this entry might be not finished
+                    buffer += "commit " + bufferSplit.pop();
+                    bufferSplit.forEach(trimmedCommitLine => {
+                        commitLines.push("commit " + trimmedCommitLine);
+                    });
+                }
             },
             stderr: (data) => {
-                console.log(`Command Error: $[data.toString()}`);
+                console.log(`Command Error: ${data.toString()}`);
             }
         }
     };
-    const args = ["log", "--format=fuller", `${sha}..HEAD`];
+    const args = ["log", "--format=fuller", `${fromSha}..${toSha}`];
     try {
         await exec.exec("git", args, options);
     }
@@ -3414,7 +3416,7 @@ const GitReleaseNotes_1 = __nccwpck_require__(3954);
 const GithubAdapter_1 = __nccwpck_require__(7605);
 const JiraAdapter_1 = __nccwpck_require__(311);
 module.exports = {
-    releaseNotesString: (fromSha) => {
+    releaseNotesString: (fromSha, toSha) => {
         const jiraUrl = process.env.JIRA_URL;
         const jiraUser = process.env.JIRA_USER;
         const jiraPat = process.env.JIRA_PASS_PWA;
@@ -3427,7 +3429,7 @@ module.exports = {
         let notesString = "";
         (async () => {
             let notes;
-            notes = await rn.getNotesStringWithJira(fromSha);
+            notes = await rn.getNotesStringWithJira(fromSha, toSha);
             console.log("Notes:");
             console.log(notes);
             return notes;
@@ -3440,29 +3442,16 @@ module.exports = {
 /***/ }),
 
 /***/ 7605:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubAdapter = void 0;
-const github_1 = __importDefault(__nccwpck_require__(5438));
 const git_helpers_1 = __nccwpck_require__(2399);
 class GithubAdapter {
-    contextCommitSHA = "";
-    constructor() {
-        if (github_1.default) {
-            this.contextCommitSHA = github_1.default.context.sha;
-        }
-    }
-    async getCommits() {
-        return await (0, git_helpers_1.getCommits)(this.contextCommitSHA);
-    }
-    async getCommitsSinceSha(sha) {
-        return await (0, git_helpers_1.getCommits)(sha);
+    async getCommitsSinceSha(fromSha, toSha) {
+        return await (0, git_helpers_1.getCommits)(fromSha, toSha);
     }
 }
 exports.GithubAdapter = GithubAdapter;
@@ -18539,23 +18528,110 @@ module.exports = require("zlib");
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1514);
+/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_exec__WEBPACK_IMPORTED_MODULE_0__);
 const core = __nccwpck_require__(2186);
 const notes =  __nccwpck_require__(3752);
+const github = __nccwpck_require__(5438);
+
+
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    console.log("Running ")
-    const notesString = notes.releaseNotesString("ab33640")
-    console.log("Notes: @bamboostick/git_release_notes");
+
+    console.log("Getting release notes: ");
+    console.log(github.context);
+    console.log("\----------BASE-------------")
+    console.log(github.context.payload.pull_request.base);
+    console.log("\----------HEAD-------------")
+    console.log(github.context.payload.pull_request.head);
+    console.log(github.context.payload.before);
+    console.log("-----------------");
+
+
+  //
+  //
+  //   console.log(github.context.payload.after);
+  //   console.log(github.context.payload.pull_request.base.sha)
+  //
+  //   const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.ref}..${github.context.payload.pull_request.head.ref}`];
+  //
+  //   try{
+  //     await exec.exec("git", args);
+  //   }
+  //   catch (error){
+  //     console.log("Error while git log. ");
+  //     console.log(error);
+  //   }
+
+    let fromRef = "";
+    let toRef = "";
+
+    switch(github.context.payload.eventName){
+      case 'pull_request':{
+        fromRef = github.context.payload.pull_request.base.sha;
+        toRef = github.context.payload.after;
+        break;
+      }
+      default: {
+        fromRef = github.context.payload.pull_request.base.sha;
+        toRef = github.context.payload.after;
+      }
+    }
+
+    const notesString = notes.releaseNotesString(fromRef, toRef);
+    console.log("Notes: ");
     console.log(notesString);
     core.setOutput('notes', notesString);
   } catch (error) {
