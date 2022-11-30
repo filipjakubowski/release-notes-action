@@ -18,7 +18,7 @@ async function run() {
     console.log(github.context.payload.after);
     console.log(github.context.payload.pull_request.base.sha)
 
-    const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.sha}..`];
+    const args = ["log", "--format=oneline", `${github.context.ref}..${github.context.payload.pull_request.base.ref}`];
 
     try{
       await exec.exec("git", args);
