@@ -8,7 +8,7 @@ async function run() {
     console.log("Getting release notes: ");
     console.log(github.context);
     const fromRef = github.context.payload.pull_request.base.sha;
-    const toRef = github.context.payload.after;
+    const toRef = github.context.payload.pull_request.head.sha;
     const notesString = notes.releaseNotesString(fromRef, toRef);
     console.log("Notes: ");
     console.log(notesString);
