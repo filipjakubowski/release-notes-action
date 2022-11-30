@@ -6,6 +6,11 @@ on:
       - main
       - 'releases/*'
   workflow_dispatch:
+  env:
+    JIRA_PROJECT_KEY: 'WP'
+    JIRA_URL: 'https://koia.atlassian.net'
+    JIRA_API_TOKEN: ${{ secrets.JIRA_PAT }}
+    JIRA_USERNAME: 'filip.jakubowski@gmail.com'
 
 jobs:
   # unit tests
