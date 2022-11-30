@@ -32,4 +32,5 @@ jobs:
       uses: ./
       id: notes
     - run: |
+        echo ${{ steps.notes.outputs.hello }}
         echo ${{ steps.notes.outputs.notes }}
