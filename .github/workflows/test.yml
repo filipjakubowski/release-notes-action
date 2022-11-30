@@ -9,8 +9,8 @@ on:
 env:
   JIRA_PROJECT_KEY: 'WP'
   JIRA_URL: 'https://koia.atlassian.net'
-  JIRA_API_TOKEN: ${{ secrets.JIRA_PAT }}
-  JIRA_USERNAME: 'filip.jakubowski@gmail.com'
+  JIRA_PASS_PWA: ${{ secrets.JIRA_PAT }}
+  JIRA_USER: 'filip.jakubowski@gmail.com'
 
 jobs:
   # unit tests

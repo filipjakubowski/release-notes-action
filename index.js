@@ -7,28 +7,28 @@ import * as exec from "@actions/exec";
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    console.log("Getting release notes: ");
-    console.log(github.context);
-    console.log("\----------BASE-------------")
-    console.log(github.context.payload.pull_request.base);
-    console.log("\----------HEAD-------------")
-    console.log(github.context.payload.pull_request.head);
-    console.log(github.context.payload.before);
-    console.log("-----------------");
-
-
-    console.log(github.context.payload.after);
-    console.log(github.context.payload.pull_request.base.sha)
-
-    const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.ref}..${github.context.payload.pull_request.head.ref}`];
-
-    try{
-      await exec.exec("git", args);
-    }
-    catch (error){
-      console.log("Error while git log. ");
-      console.log(error);
-    }
+     console.log("Getting release notes: ");
+  //   console.log(github.context);
+  //   console.log("\----------BASE-------------")
+  //   console.log(github.context.payload.pull_request.base);
+  //   console.log("\----------HEAD-------------")
+  //   console.log(github.context.payload.pull_request.head);
+  //   console.log(github.context.payload.before);
+  //   console.log("-----------------");
+  //
+  //
+  //   console.log(github.context.payload.after);
+  //   console.log(github.context.payload.pull_request.base.sha)
+  //
+  //   const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.ref}..${github.context.payload.pull_request.head.ref}`];
+  //
+  //   try{
+  //     await exec.exec("git", args);
+  //   }
+  //   catch (error){
+  //     console.log("Error while git log. ");
+  //     console.log(error);
+  //   }
 
 
     const fromRef = github.context.payload.pull_request.base.sha;
