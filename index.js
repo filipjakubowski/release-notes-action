@@ -6,9 +6,10 @@ const github = require('@actions/github');
 async function run() {
   try {
     console.log("Running ")
+    console.log("Context: ");
+    console.log(github.context);
 
-    const payload = JSON.stringify(github.context.payload, undefined, 2)
-    const fromRef = github.event.pull_request.merge_commit_sha;
+    const fromRef = github.event.merge_commit_sha;
     const toRef = github.context.sha;
     const notesString = notes.releaseNotesString(fromRef, toRef);
     console.log("Notes: @bamboostick/git_release_notes");
