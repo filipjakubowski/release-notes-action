@@ -2832,9 +2832,9 @@ const notes =  __nccwpck_require__(959);
 async function run() {
   try {
     console.log("Running ")
-    const notesString = notes.getReleaseNotesString("ab33640")
+    const notesString = notes.releaseNotesString("ab33640")
     console.log("Notes: @bamboostick/git_release_notes");
-    console.log(notes);
+    console.log(notesString);
     core.setOutput('notes', notesString);
   } catch (error) {
     core.setFailed(error.message);
