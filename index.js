@@ -7,7 +7,8 @@ import * as exec from "@actions/exec";
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-     console.log("Getting release notes: ");
+
+    console.log("Getting release notes: ");
     console.log(github.context);
     console.log("\----------BASE-------------")
     console.log(github.context.payload.pull_request.base);
@@ -15,6 +16,8 @@ async function run() {
     console.log(github.context.payload.pull_request.head);
     console.log(github.context.payload.before);
     console.log("-----------------");
+
+
   //
   //
   //   console.log(github.context.payload.after);
@@ -30,9 +33,21 @@ async function run() {
   //     console.log(error);
   //   }
 
+    let fromRef = "";
+    let toRef = "";
 
-    const fromRef = github.context.payload.pull_request.base.sha;
-    const toRef = github.context.payload.after;
+    switch(github.context.payload.eventName){
+      case 'pull_request':{
+        fromRef = github.context.payload.pull_request.base.sha;
+        toRef = github.context.payload.after;
+        break;
+      }
+      default: {
+        fromRef = github.context.payload.pull_request.base.sha;
+        toRef = github.context.payload.after;
+      }
+    }
+
     const notesString = notes.releaseNotesString(fromRef, toRef);
     console.log("Notes: ");
     console.log(notesString);
