@@ -8,7 +8,8 @@ import * as exec from "@actions/exec";
 async function run() {
   try {
 
-    console.log("Getting release notes: ");
+    console.log(`Preparing Release Notes for action: ${github.context.payload.eventName}`);
+
     console.log(github.context);
     console.log("\----------BASE-------------")
     console.log(github.context.payload.pull_request.base);
@@ -16,7 +17,6 @@ async function run() {
     console.log(github.context.payload.pull_request.head);
     console.log(github.context.payload.before);
     console.log("-----------------");
-
 
   //
   //
@@ -48,9 +48,13 @@ async function run() {
       }
     }
 
-    const notesString = notes.releaseNotesString(fromRef, toRef);
-    console.log("Notes: ");
-    console.log(notesString);
+    const notesString = "";
+    if(fromRef != undefined && toRef != undefined) {
+      const notesString = notes.releaseNotesString(fromRef, toRef);
+      console.log("Notes: ");
+      console.log(notesString);
+    }
+
     core.setOutput('notes', notesString);
   } catch (error) {
     core.setFailed(error.message);
