@@ -1,8 +1,6 @@
 const core = require('@actions/core');
 const notes =  require('@bamboostick/git_release_notes');
 const github = require('@actions/github');
-import * as exec from "@actions/exec";
-
 
 // most @actions toolkit packages have async methods
 async function run() {

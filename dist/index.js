@@ -3347,14 +3347,14 @@ const exec = __importStar(__nccwpck_require__(1514));
 function gitLogToGitCommit(commitSting) {
     const lines = commitSting
         .split("\n")
-        .filter(line => line.length > 0);
+        .filter(line => line.length > 1);
     let gc = {
-        commit: lines[0].split(" ")[1].trim(),
-        author: lines[1].split(":")[1].trim(),
-        authorDateString: lines[2].split(":")[1].trim(),
-        authorHandle: lines[3].split(":")[1].trim(),
-        commitDateString: lines[4].split(":")[1].trim(),
-        title: lines[5].trim(),
+        commit: lines[0]?.split(" ")[1]?.trim(),
+        author: lines[1]?.split(":")[1]?.trim(),
+        authorDateString: lines[2]?.split(":")[1]?.trim(),
+        authorHandle: lines[3]?.split(":")[1]?.trim(),
+        commitDateString: lines[4]?.split(":")[1]?.trim(),
+        title: lines[5]?.trim(),
     };
     if (lines.length > 6) {
         gc.message = lines[6].trim();
@@ -18528,69 +18528,24 @@ module.exports = require("zlib");
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-"use strict";
-__nccwpck_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1514);
-/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_exec__WEBPACK_IMPORTED_MODULE_0__);
 const core = __nccwpck_require__(2186);
 const notes =  __nccwpck_require__(3752);
 const github = __nccwpck_require__(5438);
-
-
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
 
-    console.log("Getting release notes: ");
+    console.log(`Preparing Release Notes for action: ${github.context.payload.eventName}`);
+
     console.log(github.context);
     console.log("\----------BASE-------------")
     console.log(github.context.payload.pull_request.base);
@@ -18598,7 +18553,6 @@ async function run() {
     console.log(github.context.payload.pull_request.head);
     console.log(github.context.payload.before);
     console.log("-----------------");
-
 
   //
   //
@@ -18630,9 +18584,13 @@ async function run() {
       }
     }
 
-    const notesString = notes.releaseNotesString(fromRef, toRef);
-    console.log("Notes: ");
-    console.log(notesString);
+    const notesString = "";
+    if(fromRef != undefined && toRef != undefined) {
+      const notesString = notes.releaseNotesString(fromRef, toRef);
+      console.log("Notes: ");
+      console.log(notesString);
+    }
+
     core.setOutput('notes', notesString);
   } catch (error) {
     core.setFailed(error.message);
