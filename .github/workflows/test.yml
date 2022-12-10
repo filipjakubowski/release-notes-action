@@ -1,4 +1,4 @@
-name: "units-test"
+name: "Test GA"
 on:
   pull_request:
   push:

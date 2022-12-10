@@ -3356,6 +3356,9 @@ function gitLogToGitCommit(commitSting) {
         commitDateString: lines[4]?.split(":")[1]?.trim(),
         title: lines[5]?.trim(),
     };
+    if (gc.author == undefined) {
+        throw Error("error reding: " + commitSting);
+    }
     if (lines.length > 6) {
         gc.message = lines[6].trim();
     }
