@@ -3285,9 +3285,22 @@ class GitReleaseNotes {
             return this.getNoteString(c);
         });
     }
+    async getNotesWithJiraFromGithubCommits(githubCommits) {
+        let filteredCommits = githubCommits.filter(commit => {
+            const matchResult = commit.message.match(this.jiraAdapter.getJIRARegexp());
+            if (matchResult != null) {
+                commit.jiraKey = matchResult[0];
+            }
+            return matchResult != null;
+        });
+        let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
+        return commits.map((c) => {
+            return this.getNoteString(c);
+        });
+    }
     async getNotesStringWithJira(fromSha, toSha) {
         const notes = await this.getNotesWithJira(fromSha, toSha);
-        var notesString = "";
+        let notesString = "";
         notes.forEach(n => {
             notesString += n + "\n";
         });
@@ -3300,11 +3313,17 @@ class GitReleaseNotes {
         return `[${commit.jiraKey}](${commit.jiraUrl})`;
     }
     getGitJiraSummary(commit) {
-        if (commit.summary) {
-            return `${commit.summary} [${commit.jiraStatus}]`;
+        if (commit.jiraSummary) {
+            return `${commit.jiraSummary} [${commit.jiraStatus}]`;
         }
         else {
-            return `${commit.title}`;
+            if (commit.title) {
+                return commit.title;
+            }
+            else if (commit.message) {
+                return commit.message;
+            }
+            return "";
         }
     }
 }
@@ -3348,6 +3367,8 @@ function gitLogToGitCommit(commitSting) {
     const lines = commitSting
         .split("\n")
         .filter(line => line.length > 1);
+    console.log("mapping commit");
+    console.log(lines);
     let gc = {
         commit: lines[0]?.split(" ")[1]?.trim(),
         author: lines[1]?.split(":")[1]?.trim(),
@@ -3374,11 +3395,17 @@ async function getCommits(fromSha, toSha) {
                 if (data != undefined) {
                     const newBuffer = buffer + data.toString();
                     buffer = "";
-                    const bufferSplit = newBuffer.split("commit ");
-                    // this entry might be not finished
-                    buffer += "commit " + bufferSplit.pop();
-                    bufferSplit.forEach(trimmedCommitLine => {
-                        commitLines.push("commit " + trimmedCommitLine);
+                    const bufferSplit = newBuffer.split("\n");
+                    bufferSplit.forEach((bufferLine) => {
+                        console.log(bufferLine);
+                        const match = bufferLine.match(/^commit \w{40}/);
+                        if (match != undefined) {
+                            commitLines.push(buffer);
+                            buffer = bufferLine + "\n";
+                        }
+                        else {
+                            buffer += bufferLine + "\n";
+                        }
                     });
                 }
             },
@@ -3418,6 +3445,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const GitReleaseNotes_1 = __nccwpck_require__(3954);
 const GithubAdapter_1 = __nccwpck_require__(7605);
 const JiraAdapter_1 = __nccwpck_require__(311);
+__nccwpck_require__(153).config();
 module.exports = {
     releaseNotesString: (fromSha, toSha) => {
         const jiraUrl = process.env.JIRA_URL;
@@ -3438,8 +3466,28 @@ module.exports = {
             return notes;
         })();
         return notesString;
+    },
+    releaseNotesStringFromCommits: (githubCommits) => {
+        const jiraUrl = process.env.JIRA_URL;
+        const jiraUser = process.env.JIRA_USER;
+        const jiraPat = process.env.JIRA_PASS_PWA;
+        const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
+        const jiraType = process.env.IS_JIRA_SERVER ? JiraAdapter_1.JiraTypeEnum.SERVER : JiraAdapter_1.JiraTypeEnum.CLOUD;
+        let ga = new GithubAdapter_1.GithubAdapter();
+        let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
+        ja.addProjectKey(jiraProjectKey);
+        let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
+        let notesString = "";
+        (async () => {
+            let notes;
+            notes = await rn.getNotesWithJiraFromGithubCommits(githubCommits);
+            console.log("Notes:");
+            console.log(notes);
+            return notes;
+        })();
     }
 };
+// module.exports.releaseNotesString("5b86e0","HEAD");
 
 
 /***/ }),
@@ -3557,7 +3605,7 @@ class JiraAdapter {
         }
     }
     updateCommitWithJiraResponse(commit, data) {
-        commit.summary = data.fields.summary;
+        commit.jiraSummary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
         commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
         return commit;
@@ -14550,6 +14598,14 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 153:
+/***/ ((module) => {
+
+module.exports = eval("require")("dotenv");
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -18547,15 +18603,14 @@ const github = __nccwpck_require__(5438);
 async function run() {
   try {
 
-    console.log(`Preparing Release Notes for action: ${github.context.payload.eventName}`);
+    const eventName = github.context.eventName;
 
+    console.log(eventName);
+    console.log(`Preparing Release Notes for action: ${eventName}`);
+    console.log(`context:`);
     console.log(github.context);
-    console.log("\----------BASE-------------")
-    console.log(github.context.payload.pull_request.base);
-    console.log("\----------HEAD-------------")
-    console.log(github.context.payload.pull_request.head);
-    console.log(github.context.payload.before);
-    console.log("-----------------");
+    console.log(`--------------------------------`);
+
 
   //
   //
@@ -18575,8 +18630,21 @@ async function run() {
     let fromRef = "";
     let toRef = "";
 
-    switch(github.context.payload.eventName){
+    switch(eventName){
+      case 'push':{
+        let commits = github.context.payload.commits;
+        console.log('commit');
+        console.log(commits[0]);
+        break;
+      }
       case 'pull_request':{
+        console.log("\----------BASE-------------")
+        console.log(github.context.payload.pull_request.base);
+        console.log("\----------HEAD-------------")
+        console.log(github.context.payload.pull_request.head);
+        console.log(github.context.payload.before);
+        console.log("-----------------");
+
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
         break;
