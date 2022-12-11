@@ -36,10 +36,9 @@ async function run() {
     switch(eventName){
       case 'push':{
         let commits = github.context.payload.commits;
-        console.log('commit');
-        console.log(commits[0]);
-
         const notesString = notes.releaseNotesStringFromCommits(commits);
+        console.log('notes');
+        console.log(notesString);
         core.setOutput('notes', notesString);
         break;
       }
@@ -54,6 +53,8 @@ async function run() {
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
         const notesString = notes.releaseNotesString(fromRef, toRef);
+        console.log('notes');
+        console.log(notesString);
         core.setOutput('notes', notesString);
         break;
       }
