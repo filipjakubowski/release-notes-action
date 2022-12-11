@@ -6,8 +6,9 @@ const github = require('@actions/github');
 async function run() {
   try {
 
-    const eventName: github.context.payload.eventName;
+    const eventName = github.context.eventName;
 
+    console.log(eventName);
     console.log(`Preparing Release Notes for action: ${eventName}`);
     console.log(`context:`);
     console.log(github.context);
@@ -32,7 +33,7 @@ async function run() {
     let fromRef = "";
     let toRef = "";
 
-    switch(github.context.payload.eventName){
+    switch(eventName){
       case 'push':{
         let commits = github.context.payload.commits;
         console.log('commit');
