@@ -2,14 +2,14 @@ const core = require('@actions/core');
 const notes =  require('@bamboostick/git_release_notes');
 const github = require('@actions/github');
 
-const os = require("os")
-const fs = require("fs")
-
-function setOutput(key, value) {
-  // Temporary hack until core actions library catches up with github new recommendations
-  const output = process.env['GITHUB_OUTPUT']
-  fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
-}
+// const os = require("os")
+// const fs = require("fs")
+//
+// function setOutput(key, value) {
+//   // Temporary hack until core actions library catches up with github new recommendations
+//   const output = process.env['GITHUB_OUTPUT']
+//   fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
+// }
 
 
 // most @actions toolkit packages have async methods
@@ -39,6 +39,7 @@ async function run() {
   //     console.log("Error while git log. ");
   //     console.log(error);
   //   }
+    core.setOutput('test', "ABC");
 
     let fromRef = "";
     let toRef = "";
@@ -49,7 +50,7 @@ async function run() {
         const notesString = notes.releaseNotesStringFromCommits(commits);
         console.log('notes');
         console.log(notesString);
-        setOutput('notes', notesString);
+        core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
@@ -65,7 +66,7 @@ async function run() {
         const notesString = notes.releaseNotesString(fromRef, toRef);
         console.log('notes');
         console.log(notesString);
-        setOutput('notes', notesString);
+        core.setOutput('notes', notesString);
         break;
       }
     }
