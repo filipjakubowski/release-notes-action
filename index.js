@@ -38,6 +38,7 @@ async function run() {
         let commits = github.context.payload.commits;
         console.log('commit');
         console.log(commits[0]);
+
         const notesString = notes.releaseNotesStringFromCommits(commits);
         core.setOutput('notes', notesString);
         break;
