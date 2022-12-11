@@ -18635,6 +18635,8 @@ async function run() {
         let commits = github.context.payload.commits;
         console.log('commit');
         console.log(commits[0]);
+        const notesString = notes.releaseNotesStringFromCommits(commits);
+        core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
@@ -18647,22 +18649,13 @@ async function run() {
 
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
+        const notesString = notes.releaseNotesString(fromRef, toRef);
+        core.setOutput('notes', notesString);
         break;
       }
-      default: {
-        fromRef = github.context.payload.pull_request.base.sha;
-        toRef = github.context.payload.after;
-      }
     }
 
-    const notesString = "";
-    if(fromRef != undefined && toRef != undefined) {
-      const notesString = notes.releaseNotesString(fromRef, toRef);
-      console.log("Notes: ");
-      console.log(notesString);
-    }
 
-    core.setOutput('notes', notesString);
   } catch (error) {
     core.setFailed(error.message);
   }
