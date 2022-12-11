@@ -6,15 +6,13 @@ const github = require('@actions/github');
 async function run() {
   try {
 
-    console.log(`Preparing Release Notes for action: ${github.context.payload.eventName}`);
+    const eventName: github.context.payload.eventName;
 
+    console.log(`Preparing Release Notes for action: ${eventName}`);
+    console.log(`context:`);
     console.log(github.context);
-    console.log("\----------BASE-------------")
-    console.log(github.context.payload.pull_request.base);
-    console.log("\----------HEAD-------------")
-    console.log(github.context.payload.pull_request.head);
-    console.log(github.context.payload.before);
-    console.log("-----------------");
+    console.log(`--------------------------------`);
+
 
   //
   //
@@ -42,6 +40,13 @@ async function run() {
         break;
       }
       case 'pull_request':{
+        console.log("\----------BASE-------------")
+        console.log(github.context.payload.pull_request.base);
+        console.log("\----------HEAD-------------")
+        console.log(github.context.payload.pull_request.head);
+        console.log(github.context.payload.before);
+        console.log("-----------------");
+
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
         break;
