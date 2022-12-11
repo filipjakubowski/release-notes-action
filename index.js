@@ -18,11 +18,11 @@ async function run() {
 
     const eventName = github.context.eventName;
 
-    console.log(eventName);
+    //console.log(eventName);
     console.log(`Preparing Release Notes for action: ${eventName}`);
-    console.log(`context:`);
-    console.log(github.context);
-    console.log(`--------------------------------`);
+    // console.log(`context:`);
+    // console.log(github.context);
+    // console.log(`--------------------------------`);
 
 
   //
@@ -49,23 +49,23 @@ async function run() {
       case 'push':{
         let commits = github.context.payload.commits;
         const notesString = notes.releaseNotesStringFromCommits(commits);
-        console.log('notes');
+        console.log('notes:');
         console.log(notesString);
         core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
-        console.log("\----------BASE-------------")
-        console.log(github.context.payload.pull_request.base);
-        console.log("\----------HEAD-------------")
-        console.log(github.context.payload.pull_request.head);
-        console.log(github.context.payload.before);
-        console.log("-----------------");
+        // console.log("\----------BASE-------------")
+        // console.log(github.context.payload.pull_request.base);
+        // console.log("\----------HEAD-------------")
+        // console.log(github.context.payload.pull_request.head);
+        // console.log(github.context.payload.before);
+        // console.log("-----------------");
 
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
         const notesString = notes.releaseNotesString(fromRef, toRef);
-        console.log('notes');
+        console.log('notes:');
         console.log(notesString);
         core.setOutput('notes', notesString);
         break;
