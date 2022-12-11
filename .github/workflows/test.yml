@@ -33,6 +33,7 @@ jobs:
       id: notes
     - run: |
         echo "notes: ${{steps.notes.outputs.test}}"
+        echo "notes2: ${{steps.notes.outputs.test2}}"
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@v1
       with:

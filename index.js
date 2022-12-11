@@ -2,14 +2,14 @@ const core = require('@actions/core');
 const notes =  require('@bamboostick/git_release_notes');
 const github = require('@actions/github');
 
-// const os = require("os")
-// const fs = require("fs")
-//
-// function setOutput(key, value) {
-//   // Temporary hack until core actions library catches up with github new recommendations
-//   const output = process.env['GITHUB_OUTPUT']
-//   fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
-// }
+const os = require("os")
+const fs = require("fs")
+
+function setOutputFile(key, value) {
+  // Temporary hack until core actions library catches up with github new recommendations
+  const output = process.env['GITHUB_OUTPUT']
+  fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
+}
 
 
 // most @actions toolkit packages have async methods
@@ -40,6 +40,7 @@ async function run() {
   //     console.log(error);
   //   }
     core.setOutput('test', "ABC");
+    setOutputFile('test2', "ABCD");
 
     let fromRef = "";
     let toRef = "";
