@@ -35,6 +35,12 @@ async function run() {
     let toRef = "";
 
     switch(github.context.payload.eventName){
+      case 'push':{
+        let commits = github.context.payload.commits;
+        console.log('commit');
+        console.log(commits[0]);
+        break;
+      }
       case 'pull_request':{
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
