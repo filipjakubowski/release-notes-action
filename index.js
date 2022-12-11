@@ -6,7 +6,7 @@ const github = require('@actions/github');
 async function run() {
   try {
 
-    const eventName: github.context.payload.eventName;
+    const eventName= github.context.payload.eventName;
 
     console.log(`Preparing Release Notes for action: ${eventName}`);
     console.log(`context:`);
