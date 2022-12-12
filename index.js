@@ -23,8 +23,6 @@ async function run() {
     // console.log(`context:`);
     // console.log(github.context);
     // console.log(`--------------------------------`);
-
-
   //
   //
   //   console.log(github.context.payload.after);
@@ -49,8 +47,8 @@ async function run() {
       case 'push':{
         let commits = github.context.payload.commits;
         const notesString = notes.releaseNotesStringFromCommits(commits);
-        console.log('notes:');
-        console.log(notesString);
+        console.log('************** notes:');
+        console.log(`>${notesString}<`);
         core.setOutput('notes', notesString);
         break;
       }
@@ -65,7 +63,7 @@ async function run() {
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
         const notesString = notes.releaseNotesString(fromRef, toRef);
-        console.log('notes:');
+        console.log('************** notes:');
         console.log(`>${notesString}<`);
         core.setOutput('notes', notesString);
         break;
