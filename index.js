@@ -66,13 +66,11 @@ async function run() {
         toRef = github.context.payload.after;
         const notesString = notes.releaseNotesString(fromRef, toRef);
         console.log('notes:');
-        console.log(notesString);
+        console.log(`>${notesString}<`);
         core.setOutput('notes', notesString);
         break;
       }
     }
-
-
   } catch (error) {
     core.setFailed(error.message);
   }
