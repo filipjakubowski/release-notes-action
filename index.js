@@ -55,6 +55,7 @@ async function run() {
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
+        console.log(`Release Notes Output: ${notesString}`);
         core.setOutput('notes', notesString);
         break;
       }
