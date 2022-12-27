@@ -39,7 +39,7 @@ async function run() {
         console.log('commit');
         console.log(commits[0]);
 
-        const notesString = notes.releaseNotesStringFromCommits(commits);
+        const notesString = await notes.releaseNotesStringFromCommits(commits);
         core.setOutput('notes', notesString);
         break;
       }
@@ -53,7 +53,7 @@ async function run() {
 
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.after;
-        const notesString = notes.releaseNotesString(fromRef, toRef);
+        const notesString = await notes.releaseNotesString(fromRef, toRef);
         core.setOutput('notes', notesString);
         break;
       }
