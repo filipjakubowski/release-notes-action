@@ -44,6 +44,8 @@ async function run() {
         break;
       }
       case 'pull_request':{
+
+        
         console.log("\----------BASE-------------")
         console.log(github.context.payload.pull_request.base);
         console.log("\----------HEAD-------------")
