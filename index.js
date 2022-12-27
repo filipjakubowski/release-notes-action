@@ -52,7 +52,7 @@ async function run() {
         console.log("-----------------");
 
         fromRef = github.context.payload.pull_request.base.sha;
-        toRef = github.context.payload.after;
+        toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
         core.setOutput('notes', notesString);
         break;
