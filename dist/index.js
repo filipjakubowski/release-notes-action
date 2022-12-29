@@ -3293,13 +3293,15 @@ class GitReleaseNotes {
             }
             return matchResult != null;
         });
+        filteredCommits = this.removeCommitsDuplicates(filteredCommits);
         let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
         return commits.map((c) => {
             return this.getNoteString(c);
         });
     }
     async getNotesStingWithJitaFromGithubCommits(githubCommits) {
-        const notes = await this.getNotesWithJiraFromGithubCommits(githubCommits);
+        const filteredCommits = this.removeCommitsDuplicates(githubCommits);
+        const notes = await this.getNotesWithJiraFromGithubCommits(filteredCommits);
         let notesString = "";
         notes.forEach(n => {
             notesString += n + "\n";
@@ -3333,6 +3335,9 @@ class GitReleaseNotes {
             }
             return "";
         }
+    }
+    removeCommitsDuplicates(commits) {
+        return commits.filter((commit, index, self) => index === self.findIndex((t) => (t.jiraKey === commit.jiraKey)));
     }
 }
 exports.GitReleaseNotes = GitReleaseNotes;
