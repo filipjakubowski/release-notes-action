@@ -3276,7 +3276,7 @@ class GitReleaseNotes {
         let commits = [];
         try {
             commits = await this.getNotesFromSha(fromSha, toSha);
-            const filteredCommits = this.removeGitCommitDuplicates(commits);
+            commits = this.removeGitCommitDuplicates(commits);
         }
         catch (error) {
             console.log(error);
@@ -3338,10 +3338,37 @@ class GitReleaseNotes {
         }
     }
     removeGithubCommitDuplicates(commits) {
-        return commits.filter((commit, index, self) => index === self.findIndex((t) => (t.jiraKey === commit.jiraKey)));
+        console.log("removeGithubCommitDuplicates");
+        let filteredComits = [];
+        commits.filter((commit) => {
+            if (filteredComits.findIndex((c) => {
+                return c.jiraKey === commit.jiraKey;
+            }) === -1) {
+                filteredComits.push(commit);
+            }
+        });
+        console.log("***");
+        console.log(filteredComits);
+        return filteredComits;
     }
     removeGitCommitDuplicates(commits) {
-        return commits.filter((commit, index, self) => index === self.findIndex((t) => (t.jiraKey === commit.jiraKey)));
+        console.log("removeGitCommitDuplicates");
+        let filteredComits = [];
+        commits.filter((commit) => {
+            if (filteredComits.findIndex((c) => {
+                return c.jiraKey === commit.jiraKey;
+            }) === -1) {
+                filteredComits.push(commit);
+            }
+        });
+        console.log("***");
+        console.log(filteredComits);
+        return filteredComits;
+        // return commits.filter((commit, index, self) =>
+        //         index === self.findIndex((t) => (
+        //             t.jiraKey === commit.jiraKey
+        //         ))
+        // );
     }
 }
 exports.GitReleaseNotes = GitReleaseNotes;
@@ -3497,8 +3524,9 @@ module.exports = {
         return await releaseNotesStringFromCommits(githubCommits);
     }
 };
-//let notes = await module.exports.releaseNotesString("5b86e0","HEAD");
-//console.log(`Notes: ${notes}`);
+let notes = module.exports.releaseNotesString("5b86e0", "HEAD").then((notesString) => {
+    console.log(`!!!!: ${notesString}`);
+});
 
 
 /***/ }),
