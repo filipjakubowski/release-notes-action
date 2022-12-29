@@ -3276,6 +3276,7 @@ class GitReleaseNotes {
         let commits = [];
         try {
             commits = await this.getNotesFromSha(fromSha, toSha);
+            const filteredCommits = this.removeGitCommitDuplicates(commits);
         }
         catch (error) {
             console.log(error);
@@ -3293,14 +3294,14 @@ class GitReleaseNotes {
             }
             return matchResult != null;
         });
-        filteredCommits = this.removeCommitsDuplicates(filteredCommits);
+        filteredCommits = this.removeGithubCommitDuplicates(filteredCommits);
         let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
         return commits.map((c) => {
             return this.getNoteString(c);
         });
     }
     async getNotesStingWithJitaFromGithubCommits(githubCommits) {
-        const filteredCommits = this.removeCommitsDuplicates(githubCommits);
+        const filteredCommits = this.removeGithubCommitDuplicates(githubCommits);
         const notes = await this.getNotesWithJiraFromGithubCommits(filteredCommits);
         let notesString = "";
         notes.forEach(n => {
@@ -3336,7 +3337,10 @@ class GitReleaseNotes {
             return "";
         }
     }
-    removeCommitsDuplicates(commits) {
+    removeGithubCommitDuplicates(commits) {
+        return commits.filter((commit, index, self) => index === self.findIndex((t) => (t.jiraKey === commit.jiraKey)));
+    }
+    removeGitCommitDuplicates(commits) {
         return commits.filter((commit, index, self) => index === self.findIndex((t) => (t.jiraKey === commit.jiraKey)));
     }
 }
