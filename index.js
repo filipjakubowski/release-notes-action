@@ -8,7 +8,6 @@ async function run() {
 
     const eventName = github.context.eventName;
 
-    console.log(eventName);
     console.log(`Preparing Release Notes for action: ${eventName}`);
     console.log(`context:`);
     console.log(github.context);
@@ -36,15 +35,14 @@ async function run() {
     switch(eventName){
       case 'push':{
         let commits = github.context.payload.commits;
-        console.log('commit');
-        console.log(commits[0]);
+        // console.log('commit');
+        // console.log(commits[0]);
 
         const notesString = await notes.releaseNotesStringFromCommits(commits);
         core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
-
         console.log("\----------BASE-------------")
         console.log(github.context.payload.pull_request.base);
         console.log("\----------HEAD-------------")
