@@ -3246,12 +3246,13 @@ function copyFile(srcFile, destFile, force) {
 /***/ }),
 
 /***/ 3954:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitReleaseNotes = void 0;
+const ReleaseNotesStringFactory_1 = __nccwpck_require__(7953);
 class GitReleaseNotes {
     gitAdapter;
     jiraAdapter;
@@ -3283,7 +3284,7 @@ class GitReleaseNotes {
         }
         commits = await this.jiraAdapter.fillFromJira(commits);
         return commits.map((c) => {
-            return this.getNoteString(c);
+            return ReleaseNotesStringFactory_1.ReleaseNotesStringFactory.getReleaseNotesString(c);
         });
     }
     async getNotesWithJiraFromGithubCommits(githubCommits) {
@@ -3297,7 +3298,7 @@ class GitReleaseNotes {
         filteredCommits = this.removeGithubCommitDuplicates(filteredCommits);
         let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
         return commits.map((c) => {
-            return this.getNoteString(c);
+            return ReleaseNotesStringFactory_1.ReleaseNotesStringFactory.getReleaseNotesString(c);
         });
     }
     async getNotesStingWithJitaFromGithubCommits(githubCommits) {
@@ -3317,28 +3318,7 @@ class GitReleaseNotes {
         });
         return notesString;
     }
-    getNoteString(commit) {
-        return `${this.getJIRAKeyString(commit)}: ${this.getGitJiraSummary(commit)}`;
-    }
-    getJIRAKeyString(commit) {
-        return `[${commit.jiraKey}](${commit.jiraUrl})`;
-    }
-    getGitJiraSummary(commit) {
-        if (commit.jiraSummary) {
-            return `${commit.jiraSummary} [${commit.jiraStatus}]`;
-        }
-        else {
-            if (commit.title) {
-                return commit.title;
-            }
-            else if (commit.message) {
-                return commit.message;
-            }
-            return "";
-        }
-    }
     removeGithubCommitDuplicates(commits) {
-        console.log("removeGithubCommitDuplicates");
         let filteredComits = [];
         commits.filter((commit) => {
             if (filteredComits.findIndex((c) => {
@@ -3347,8 +3327,6 @@ class GitReleaseNotes {
                 filteredComits.push(commit);
             }
         });
-        console.log("***");
-        console.log(filteredComits);
         return filteredComits;
     }
     removeGitCommitDuplicates(commits) {
@@ -3361,14 +3339,7 @@ class GitReleaseNotes {
                 filteredComits.push(commit);
             }
         });
-        console.log("***");
-        console.log(filteredComits);
         return filteredComits;
-        // return commits.filter((commit, index, self) =>
-        //         index === self.findIndex((t) => (
-        //             t.jiraKey === commit.jiraKey
-        //         ))
-        // );
     }
 }
 exports.GitReleaseNotes = GitReleaseNotes;
@@ -3500,8 +3471,7 @@ async function releaseNotesString(fromSha, toSha) {
     let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
     ja.addProjectKey(jiraProjectKey);
     let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
-    let notesString = await rn.getNotesStringWithJira(fromSha, toSha);
-    return notesString;
+    return await rn.getNotesStringWithJira(fromSha, toSha);
 }
 async function releaseNotesStringFromCommits(githubCommits) {
     const jiraUrl = process.env.JIRA_URL;
@@ -3513,8 +3483,7 @@ async function releaseNotesStringFromCommits(githubCommits) {
     let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
     ja.addProjectKey(jiraProjectKey);
     let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
-    let notesString = await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
-    return;
+    return await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
 }
 module.exports = {
     releaseNotesString: async (fromSha, toSha) => {
@@ -3524,7 +3493,7 @@ module.exports = {
         return await releaseNotesStringFromCommits(githubCommits);
     }
 };
-let notes = module.exports.releaseNotesString("5b86e0", "HEAD").then((notesString) => {
+module.exports.releaseNotesString("5b86e0", "HEAD").then((notesString) => {
     console.log(`!!!!: ${notesString}`);
 });
 
@@ -3661,6 +3630,51 @@ class JiraAdapter {
     }
 }
 exports.JiraAdapter = JiraAdapter;
+
+
+/***/ }),
+
+/***/ 7953:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReleaseNotesStringFactory = void 0;
+class ReleaseNotesStringFactory {
+    static getReleaseNotesString(commit) {
+        const jiraTicket = ReleaseNotesStringFactory;
+        return `${jiraTicket.jiraKey(commit)}: ${jiraTicket.summary(commit)} ${jiraTicket.labels(commit.labels)}`;
+    }
+    static summary(commit) {
+        if (commit.jiraSummary) {
+            return `${commit.jiraSummary} [${commit.jiraStatus}]`;
+        }
+        else {
+            if (commit.title) {
+                return commit.title;
+            }
+            else if (commit.message) {
+                return commit.message;
+            }
+            return "";
+        }
+    }
+    static labels(labels) {
+        if (!labels) {
+            return ``;
+        }
+        let labelsString = "";
+        labels.forEach((label) => {
+            labelsString += `\`${label}'\, `;
+        });
+        return `[ ${labelsString} ]`;
+    }
+    static jiraKey(commit) {
+        return `[${commit.jiraKey}](${commit.jiraUrl})`;
+    }
+}
+exports.ReleaseNotesStringFactory = ReleaseNotesStringFactory;
 
 
 /***/ }),
