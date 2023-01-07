@@ -5,14 +5,12 @@ const github = require('@actions/github');
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-
     const eventName = github.context.eventName;
-
-    console.log(`Preparing Release Notes for action: ${eventName}`);
-    console.log(`context:`);
-    console.log(github.context);
-    console.log(`--------------------------------`);
-
+    // console.log(`Preparing Release Notes for action: ${eventName}`);
+    // console.log(`context:`);
+    // console.log(github.context);
+    // console.log(`--------------------------------`);
+    //
 
   //
   //
@@ -37,29 +35,26 @@ async function run() {
         let commits = github.context.payload.commits;
         // console.log('commit');
         // console.log(commits[0]);
-
         const notesString = await notes.releaseNotesStringFromCommits(commits);
         core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
-        console.log("\----------BASE-------------")
-        console.log(github.context.payload.pull_request.base);
-        console.log("\----------HEAD-------------")
-        console.log(github.context.payload.pull_request.head);
-        console.log(github.context.payload.before);
-        console.log("-----------------");
+        // console.log("\----------BASE-------------")
+        // console.log(github.context.payload.pull_request.base);
+        // console.log("\----------HEAD-------------")
+        // console.log(github.context.payload.pull_request.head);
+        // console.log(github.context.payload.before);
+        // console.log("-----------------");
 
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
-        console.log(`Release Notes Output: >${notesString}<`);
+        // console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
         break;
       }
     }
-
-
   } catch (error) {
     core.setFailed(error.message);
   }
