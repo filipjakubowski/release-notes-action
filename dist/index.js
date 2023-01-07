@@ -3246,12 +3246,13 @@ function copyFile(srcFile, destFile, force) {
 /***/ }),
 
 /***/ 3954:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitReleaseNotes = void 0;
+const ReleaseNotesStringFactory_1 = __nccwpck_require__(7953);
 class GitReleaseNotes {
     gitAdapter;
     jiraAdapter;
@@ -3276,13 +3277,14 @@ class GitReleaseNotes {
         let commits = [];
         try {
             commits = await this.getNotesFromSha(fromSha, toSha);
+            commits = this.removeGitCommitDuplicates(commits);
         }
         catch (error) {
             console.log(error);
         }
         commits = await this.jiraAdapter.fillFromJira(commits);
         return commits.map((c) => {
-            return this.getNoteString(c);
+            return ReleaseNotesStringFactory_1.ReleaseNotesStringFactory.getReleaseNotesString(c);
         });
     }
     async getNotesWithJiraFromGithubCommits(githubCommits) {
@@ -3293,13 +3295,15 @@ class GitReleaseNotes {
             }
             return matchResult != null;
         });
+        filteredCommits = this.removeGithubCommitDuplicates(filteredCommits);
         let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
         return commits.map((c) => {
-            return this.getNoteString(c);
+            return ReleaseNotesStringFactory_1.ReleaseNotesStringFactory.getReleaseNotesString(c);
         });
     }
     async getNotesStingWithJitaFromGithubCommits(githubCommits) {
-        const notes = await this.getNotesWithJiraFromGithubCommits(githubCommits);
+        const filteredCommits = this.removeGithubCommitDuplicates(githubCommits);
+        const notes = await this.getNotesWithJiraFromGithubCommits(filteredCommits);
         let notesString = "";
         notes.forEach(n => {
             notesString += n + "\n";
@@ -3314,25 +3318,28 @@ class GitReleaseNotes {
         });
         return notesString;
     }
-    getNoteString(commit) {
-        return `${this.getJIRAKeyString(commit)}: ${this.getGitJiraSummary(commit)}`;
-    }
-    getJIRAKeyString(commit) {
-        return `[${commit.jiraKey}](${commit.jiraUrl})`;
-    }
-    getGitJiraSummary(commit) {
-        if (commit.jiraSummary) {
-            return `${commit.jiraSummary} [${commit.jiraStatus}]`;
-        }
-        else {
-            if (commit.title) {
-                return commit.title;
+    removeGithubCommitDuplicates(commits) {
+        let filteredComits = [];
+        commits.filter((commit) => {
+            if (filteredComits.findIndex((c) => {
+                return c.jiraKey === commit.jiraKey;
+            }) === -1) {
+                filteredComits.push(commit);
             }
-            else if (commit.message) {
-                return commit.message;
+        });
+        return filteredComits;
+    }
+    removeGitCommitDuplicates(commits) {
+        console.log("removeGitCommitDuplicates");
+        let filteredComits = [];
+        commits.filter((commit) => {
+            if (filteredComits.findIndex((c) => {
+                return c.jiraKey === commit.jiraKey;
+            }) === -1) {
+                filteredComits.push(commit);
             }
-            return "";
-        }
+        });
+        return filteredComits;
     }
 }
 exports.GitReleaseNotes = GitReleaseNotes;
@@ -3454,49 +3461,41 @@ const GitReleaseNotes_1 = __nccwpck_require__(3954);
 const GithubAdapter_1 = __nccwpck_require__(7605);
 const JiraAdapter_1 = __nccwpck_require__(311);
 (__nccwpck_require__(2437).config)();
+async function releaseNotesString(fromSha, toSha) {
+    const jiraUrl = process.env.JIRA_URL;
+    const jiraUser = process.env.JIRA_USER;
+    const jiraPat = process.env.JIRA_PASS_PWA;
+    const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
+    const jiraType = process.env.IS_JIRA_SERVER ? JiraAdapter_1.JiraTypeEnum.SERVER : JiraAdapter_1.JiraTypeEnum.CLOUD;
+    let ga = new GithubAdapter_1.GithubAdapter();
+    let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
+    ja.addProjectKey(jiraProjectKey);
+    let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
+    return await rn.getNotesStringWithJira(fromSha, toSha);
+}
+async function releaseNotesStringFromCommits(githubCommits) {
+    const jiraUrl = process.env.JIRA_URL;
+    const jiraUser = process.env.JIRA_USER;
+    const jiraPat = process.env.JIRA_PASS_PWA;
+    const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
+    const jiraType = process.env.IS_JIRA_SERVER ? JiraAdapter_1.JiraTypeEnum.SERVER : JiraAdapter_1.JiraTypeEnum.CLOUD;
+    let ga = new GithubAdapter_1.GithubAdapter();
+    let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
+    ja.addProjectKey(jiraProjectKey);
+    let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
+    return await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
+}
 module.exports = {
-    releaseNotesString: (fromSha, toSha) => {
-        const jiraUrl = process.env.JIRA_URL;
-        const jiraUser = process.env.JIRA_USER;
-        const jiraPat = process.env.JIRA_PASS_PWA;
-        const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
-        const jiraType = process.env.IS_JIRA_SERVER ? JiraAdapter_1.JiraTypeEnum.SERVER : JiraAdapter_1.JiraTypeEnum.CLOUD;
-        let ga = new GithubAdapter_1.GithubAdapter();
-        let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
-        ja.addProjectKey(jiraProjectKey);
-        let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
-        let notesString = "";
-        (async () => {
-            notesString = await rn.getNotesStringWithJira(fromSha, toSha);
-            console.log("Notes:");
-            console.log(notesString);
-            return notesString;
-        })();
-        console.log("Notes:");
-        console.log(notesString);
-        return notesString;
+    releaseNotesString: async (fromSha, toSha) => {
+        return await releaseNotesString(fromSha, toSha);
     },
-    releaseNotesStringFromCommits: (githubCommits) => {
-        const jiraUrl = process.env.JIRA_URL;
-        const jiraUser = process.env.JIRA_USER;
-        const jiraPat = process.env.JIRA_PASS_PWA;
-        const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
-        const jiraType = process.env.IS_JIRA_SERVER ? JiraAdapter_1.JiraTypeEnum.SERVER : JiraAdapter_1.JiraTypeEnum.CLOUD;
-        let ga = new GithubAdapter_1.GithubAdapter();
-        let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
-        ja.addProjectKey(jiraProjectKey);
-        let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
-        let notesString = "";
-        (async () => {
-            let notes;
-            notesString = await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
-            console.log("Notes:");
-            console.log(notesString);
-            return notesString;
-        })();
+    releaseNotesStringFromCommits: async (githubCommits) => {
+        return await releaseNotesStringFromCommits(githubCommits);
     }
 };
-// module.exports.releaseNotesString("5b86e0","HEAD");
+module.exports.releaseNotesString("5b86e0", "HEAD").then((notesString) => {
+    console.log(`!!!!: ${notesString}`);
+});
 
 
 /***/ }),
@@ -3631,6 +3630,51 @@ class JiraAdapter {
     }
 }
 exports.JiraAdapter = JiraAdapter;
+
+
+/***/ }),
+
+/***/ 7953:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReleaseNotesStringFactory = void 0;
+class ReleaseNotesStringFactory {
+    static getReleaseNotesString(commit) {
+        const jiraTicket = ReleaseNotesStringFactory;
+        return `${jiraTicket.jiraKey(commit)}: ${jiraTicket.summary(commit)} ${jiraTicket.labels(commit.labels)}`;
+    }
+    static summary(commit) {
+        if (commit.jiraSummary) {
+            return `${commit.jiraSummary} [${commit.jiraStatus}]`;
+        }
+        else {
+            if (commit.title) {
+                return commit.title;
+            }
+            else if (commit.message) {
+                return commit.message;
+            }
+            return "";
+        }
+    }
+    static labels(labels) {
+        if (!labels) {
+            return ``;
+        }
+        let labelsString = "";
+        labels.forEach((label) => {
+            labelsString += `\`${label}'\, `;
+        });
+        return `[ ${labelsString} ]`;
+    }
+    static jiraKey(commit) {
+        return `[${commit.jiraKey}](${commit.jiraUrl})`;
+    }
+}
+exports.ReleaseNotesStringFactory = ReleaseNotesStringFactory;
 
 
 /***/ }),
@@ -18768,11 +18812,12 @@ async function run() {
         console.log('commit');
         console.log(commits[0]);
 
-        const notesString = notes.releaseNotesStringFromCommits(commits);
+        const notesString = await notes.releaseNotesStringFromCommits(commits);
         core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
+
         console.log("\----------BASE-------------")
         console.log(github.context.payload.pull_request.base);
         console.log("\----------HEAD-------------")
@@ -18781,8 +18826,9 @@ async function run() {
         console.log("-----------------");
 
         fromRef = github.context.payload.pull_request.base.sha;
-        toRef = github.context.payload.after;
-        const notesString = notes.releaseNotesString(fromRef, toRef);
+        toRef = github.context.payload.pull_request.head.sha;
+        const notesString = await notes.releaseNotesString(fromRef, toRef);
+        console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
         break;
       }

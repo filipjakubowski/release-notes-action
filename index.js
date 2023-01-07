@@ -45,7 +45,6 @@ async function run() {
       }
       case 'pull_request':{
 
-        
         console.log("\----------BASE-------------")
         console.log(github.context.payload.pull_request.base);
         console.log("\----------HEAD-------------")
@@ -54,8 +53,9 @@ async function run() {
         console.log("-----------------");
 
         fromRef = github.context.payload.pull_request.base.sha;
-        toRef = github.context.payload.after;
+        toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
+        console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
         break;
       }
