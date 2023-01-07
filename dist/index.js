@@ -3382,8 +3382,8 @@ function gitLogToGitCommit(commitSting) {
     const lines = commitSting
         .split("\n")
         .filter(line => line.length > 1);
-    console.log("mapping commit");
-    console.log(lines);
+    // console.log("mapping commit");
+    // console.log(lines);
     let gc = {
         commit: lines[0]?.split(" ")[1]?.trim(),
         author: lines[1]?.split(":")[1]?.trim(),
@@ -3493,9 +3493,12 @@ module.exports = {
         return await releaseNotesStringFromCommits(githubCommits);
     }
 };
-module.exports.releaseNotesString("5b86e0", "HEAD").then((notesString) => {
-    console.log(`!!!!: ${notesString}`);
-});
+// module.exports.releaseNotesString("5b86e0","HEAD").then(
+//     (notesString: string)=>
+//     {
+//         console.log(`------------------\n${notesString}`);
+//     }
+// );
 
 
 /***/ }),
@@ -3559,7 +3562,7 @@ class JiraAdapter {
     async fillFromJira(commits) {
         await Promise.all(commits.map(async (commit) => {
             try {
-                await this.getJiraIssue(commit);
+                const jiraIssue = await this.fetchJiraIssue(commit);
             }
             catch (error) {
                 console.log(error);
@@ -3567,7 +3570,7 @@ class JiraAdapter {
         }));
         return commits;
     }
-    async getJiraIssue(commit) {
+    async fetchJiraIssue(commit) {
         if (commit.jiraKey == null)
             return commit;
         const axiosReqConf = this.axiosConfigForJiraKey(commit.jiraKey);
@@ -3616,6 +3619,19 @@ class JiraAdapter {
         commit.jiraSummary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
         commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
+        commit.type = data.fields.issuetype.name;
+        commit.issueLinks = [];
+        if (data.fields.issuelinks) {
+            commit.issueLinks = data.fields.issuelinks;
+            commit.issueLinks?.forEach((link) => {
+                if (link.outwardIssue) {
+                    link.jiraUrl = `${this.jiraURL}/browse/${link.outwardIssue.key}`;
+                }
+                else if (link.inwardIssue) {
+                    link.jiraUrl = `${this.jiraURL}/browse/${link.inwardIssue.key}`;
+                }
+            });
+        }
         return commit;
     }
     issueUrl(jiraKey) {
@@ -3644,7 +3660,7 @@ exports.ReleaseNotesStringFactory = void 0;
 class ReleaseNotesStringFactory {
     static getReleaseNotesString(commit) {
         const jiraTicket = ReleaseNotesStringFactory;
-        return `${jiraTicket.jiraKey(commit)}: ${jiraTicket.summary(commit)} ${jiraTicket.labels(commit.labels)}`;
+        return `${jiraTicket.jiraKey(commit)}: ${jiraTicket.type(commit)} ${jiraTicket.summary(commit)} ${jiraTicket.labels(commit.labels)} ${jiraTicket.linkedJiraKeys(commit)}`;
     }
     static summary(commit) {
         if (commit.jiraSummary) {
@@ -3660,6 +3676,9 @@ class ReleaseNotesStringFactory {
             return "";
         }
     }
+    static type(commit) {
+        return `(${commit.type})`;
+    }
     static labels(labels) {
         if (!labels) {
             return ``;
@@ -3669,6 +3688,23 @@ class ReleaseNotesStringFactory {
             labelsString += `\`${label}'\, `;
         });
         return `[ ${labelsString} ]`;
+    }
+    static linkedJiraKeys(commit) {
+        let linkString = "";
+        if (commit.issueLinks) {
+            if (commit.issueLinks.length > 0) {
+                linkString += `\nLinked Jira Tickets: `;
+                commit.issueLinks.forEach((link) => {
+                    if (link.outwardIssue) {
+                        linkString += `\n * [${link.outwardIssue.key}](${link.jiraUrl}) /${link.type.outward}/ (${link.outwardIssue.fields.issuetype.name}) ${link.outwardIssue.fields.summary} [${link.outwardIssue.fields.status.name}]`;
+                    }
+                    else if (link.inwardIssue) {
+                        linkString += `\n * [${link.inwardIssue.key}](${link.jiraUrl}) /${link.type.inward}/ (${link.inwardIssue.fields.issuetype.name}) ${link.inwardIssue.fields.summary} [${link.inwardIssue.fields.status.name}]`;
+                    }
+                });
+            }
+        }
+        return linkString;
     }
     static jiraKey(commit) {
         return `[${commit.jiraKey}](${commit.jiraUrl})`;
