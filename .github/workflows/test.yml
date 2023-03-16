@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Higher versions of checkout action are not working
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - run: npm install
     - name: Get Release Notes
       uses: ./
