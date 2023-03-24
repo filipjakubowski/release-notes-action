@@ -47,7 +47,8 @@ async function run() {
         // console.log(github.context.payload.before);
         // console.log("-----------------");
 
-        fromRef = github.context.payload.pull_request.base.sha;
+        //fromRef = github.context.payload.pull_request.base.sha;
+        fromRef = github.context.payload.before;
         toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
         // console.log(`Release Notes Output: >${notesString}<`);
