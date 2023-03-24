@@ -3318,6 +3318,18 @@ class GitReleaseNotes {
         });
         return notesString;
     }
+    async getNotesStringWithJiraFromText(text) {
+        const matchResult = text.match(this.jiraAdapter.getJIRARegexp());
+        let jireIssues = [];
+        if (matchResult != null) {
+            matchResult.forEach((jiraKey) => {
+                jireIssues.push({ jiraKey: jiraKey });
+            });
+        }
+        return jireIssues.map((c) => {
+            return ReleaseNotesStringFactory_1.ReleaseNotesStringFactory.getReleaseNotesString(c);
+        });
+    }
     removeGithubCommitDuplicates(commits) {
         let filteredComits = [];
         commits.filter((commit) => {
@@ -3461,7 +3473,38 @@ const GitReleaseNotes_1 = __nccwpck_require__(3954);
 const GithubAdapter_1 = __nccwpck_require__(7605);
 const JiraAdapter_1 = __nccwpck_require__(311);
 (__nccwpck_require__(2437).config)();
+function areEnvVarsSet() {
+    let validVars = true;
+    if (process.env.JIRA_URL == null) {
+        validVars = false;
+        console.log("Missing JIRA_URL env var");
+    }
+    if (process.env.JIRA_USER == null) {
+        validVars = false;
+        console.log("Missing JIRA_USER env var");
+    }
+    if (process.env.JIRA_PASS_PWA == null) {
+        validVars = false;
+        console.log("Missing JIRA_PASS_PWA env var");
+    }
+    if (process.env.JIRA_PROJECT_KEY == null) {
+        validVars = false;
+        console.log("Missing JIRA_PROJECT_KEY env var");
+    }
+    if (process.env.IS_JIRA_SERVER == null) {
+        validVars = false;
+        console.log("Missing IS_JIRA_SERVER env var");
+    }
+    if (!validVars) {
+        console.log("Missing env vars");
+        return false;
+    }
+    return true;
+}
 async function releaseNotesString(fromSha, toSha) {
+    if (areEnvVarsSet()) {
+        return;
+    }
     const jiraUrl = process.env.JIRA_URL;
     const jiraUser = process.env.JIRA_USER;
     const jiraPat = process.env.JIRA_PASS_PWA;
@@ -3474,6 +3517,11 @@ async function releaseNotesString(fromSha, toSha) {
     return await rn.getNotesStringWithJira(fromSha, toSha);
 }
 async function releaseNotesStringFromCommits(githubCommits) {
+    if (process.env.LOG_LEVEL == "DEBUG")
+        console.log("Getting release notes from commits");
+    if (areEnvVarsSet()) {
+        return;
+    }
     const jiraUrl = process.env.JIRA_URL;
     const jiraUser = process.env.JIRA_USER;
     const jiraPat = process.env.JIRA_PASS_PWA;
@@ -3482,8 +3530,14 @@ async function releaseNotesStringFromCommits(githubCommits) {
     let ga = new GithubAdapter_1.GithubAdapter();
     let ja = new JiraAdapter_1.JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
     ja.addProjectKey(jiraProjectKey);
-    let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
-    return await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
+    try {
+        let rn = new GitReleaseNotes_1.GitReleaseNotes(ga, ja);
+        return await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
+    }
+    catch (error) {
+        console.log(error);
+        return "";
+    }
 }
 module.exports = {
     releaseNotesString: async (fromSha, toSha) => {
@@ -3493,12 +3547,6 @@ module.exports = {
         return await releaseNotesStringFromCommits(githubCommits);
     }
 };
-// module.exports.releaseNotesString("5b86e0","HEAD").then(
-//     (notesString: string)=>
-//     {
-//         console.log(`------------------\n${notesString}`);
-//     }
-// );
 
 
 /***/ }),
@@ -3552,6 +3600,7 @@ class JiraAdapter {
         this.jiraType = jiraType;
     }
     addProjectKey(key) {
+        console.log(`Adding project key ${key.toUpperCase()}`);
         this.projectKeys.push((key.toUpperCase()));
     }
     getJIRARegexp() {
@@ -18814,14 +18863,12 @@ const github = __nccwpck_require__(5438);
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-
     const eventName = github.context.eventName;
-
-    console.log(`Preparing Release Notes for action: ${eventName}`);
-    console.log(`context:`);
-    console.log(github.context);
-    console.log(`--------------------------------`);
-
+    // console.log(`Preparing Release Notes for action: ${eventName}`);
+    // console.log(`context:`);
+    // console.log(github.context);
+    // console.log(`--------------------------------`);
+    //
 
   //
   //
@@ -18846,29 +18893,26 @@ async function run() {
         let commits = github.context.payload.commits;
         // console.log('commit');
         // console.log(commits[0]);
-
         const notesString = await notes.releaseNotesStringFromCommits(commits);
         core.setOutput('notes', notesString);
         break;
       }
       case 'pull_request':{
-        console.log("\----------BASE-------------")
-        console.log(github.context.payload.pull_request.base);
-        console.log("\----------HEAD-------------")
-        console.log(github.context.payload.pull_request.head);
-        console.log(github.context.payload.before);
-        console.log("-----------------");
+        // console.log("\----------BASE-------------")
+        // console.log(github.context.payload.pull_request.base);
+        // console.log("\----------HEAD-------------")
+        // console.log(github.context.payload.pull_request.head);
+        // console.log(github.context.payload.before);
+        // console.log("-----------------");
 
         fromRef = github.context.payload.pull_request.base.sha;
         toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
-        console.log(`Release Notes Output: >${notesString}<`);
+        // console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
         break;
       }
     }
-
-
   } catch (error) {
     core.setFailed(error.message);
   }
