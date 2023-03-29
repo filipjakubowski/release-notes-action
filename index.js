@@ -9,9 +9,11 @@ async function run() {
     const eventName = github.context.eventName;
     console.log(`Preparing Release Notes for action: ${eventName}`);
     console.log("Github Context");
-    console.log("GITHUB_REF: ${GITHUB_REF}");
-    console.log("GITHUB_REF: ${GITHUB_REF}");
-    console.log("GITHUB_SHA: ${GITHUB_SHA}");
+    console.log(`github:`);
+    console.log(github);
+    console.log(`github.ref_name: ${ github.ref_name }`);
+    console.log(`GITHUB_SHA: ${GITHUB_SHA}`);
+    console.log(`GITHUB_REF: ${GITHUB_REF}`);
     console.log(`context:`);
     console.log(github.context);
     console.log(`--------------------------------`);
