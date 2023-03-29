@@ -18864,26 +18864,25 @@ const github = __nccwpck_require__(5438);
 async function run() {
   try {
     const eventName = github.context.eventName;
-    // console.log(`Preparing Release Notes for action: ${eventName}`);
-    // console.log(`context:`);
-    // console.log(github.context);
-    // console.log(`--------------------------------`);
-    //
+    console.log(`Preparing Release Notes for action: ${eventName}`);
+    console.log(`context:`);
+    console.log(github.context);
+    console.log(`--------------------------------`);
 
   //
   //
-  //   console.log(github.context.payload.after);
-  //   console.log(github.context.payload.pull_request.base.sha)
-  //
-  //   const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.ref}..${github.context.payload.pull_request.head.ref}`];
-  //
-  //   try{
-  //     await exec.exec("git", args);
-  //   }
-  //   catch (error){
-  //     console.log("Error while git log. ");
-  //     console.log(error);
-  //   }
+    console.log(github.context.payload.after);
+    console.log(github.context.payload.pull_request.base.sha)
+
+    const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.ref}..${github.context.payload.pull_request.head.ref}`];
+
+    try{
+      await exec.exec("git", args);
+    }
+    catch (error){
+      console.log("Error while git log. ");
+      console.log(error);
+    }
 
     let fromRef = "";
     let toRef = "";
@@ -18898,15 +18897,17 @@ async function run() {
         break;
       }
       case 'pull_request':{
-        // console.log("\----------BASE-------------")
-        // console.log(github.context.payload.pull_request.base);
-        // console.log("\----------HEAD-------------")
-        // console.log(github.context.payload.pull_request.head);
-        // console.log(github.context.payload.before);
-        // console.log("-----------------");
+        console.log("\----------BASE-------------")
+        console.log(github.context.payload.pull_request.base);
+        console.log("\----------HEAD-------------")
+        console.log(github.context.payload.pull_request.head);
+        console.log(github.context.payload.before);
+        console.log("-----------------");
 
-        //fromRef = github.context.payload.pull_request.base.sha;
-        fromRef = github.context.payload.before;
+        let base_sha =  github.context.payload.pull_request.base.sha;
+        let before_sha = github.context.payload.before;
+        fromRef = before_sha ? before_sha : base_sha;
+
         toRef = github.context.payload.pull_request.head.sha;
         const notesString = await notes.releaseNotesString(fromRef, toRef);
         // console.log(`Release Notes Output: >${notesString}<`);
