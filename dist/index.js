@@ -18862,15 +18862,18 @@ const github = __nccwpck_require__(5438);
 
 // most @actions toolkit packages have async methods
 async function run() {
+
   try {
     const eventName = github.context.eventName;
     console.log(`Preparing Release Notes for action: ${eventName}`);
+    console.log("Github Context");
+    console.log("GITHUB_REF: ${GITHUB_REF}");
+    console.log("GITHUB_REF: ${GITHUB_REF}");
+    console.log("GITHUB_SHA: ${GITHUB_SHA}");
     console.log(`context:`);
     console.log(github.context);
     console.log(`--------------------------------`);
 
-  //
-  //
     console.log(github.context.payload.after);
     console.log(github.context.payload.pull_request.base.sha)
 
