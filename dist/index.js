@@ -18862,7 +18862,6 @@ const github = __nccwpck_require__(5438);
 
 // most @actions toolkit packages have async methods
 async function run() {
-
   try {
     const eventName = github.context.eventName;
     console.log(`Preparing Release Notes for action: ${eventName}`);
@@ -18870,8 +18869,6 @@ async function run() {
     console.log(`github:`);
     console.log(github);
     console.log(`github.ref_name: ${ github.ref_name }`);
-    console.log(`GITHUB_SHA: ${GITHUB_SHA}`);
-    console.log(`GITHUB_REF: ${GITHUB_REF}`);
     console.log(`context:`);
     console.log(github.context);
     console.log(`--------------------------------`);
@@ -18911,9 +18908,12 @@ async function run() {
 
         let base_sha =  github.context.payload.pull_request.base.sha;
         let before_sha = github.context.payload.before;
+        let after_sha = github.context.payload.before;
+
         fromRef = before_sha ? before_sha : base_sha;
 
         toRef = github.context.payload.pull_request.head.sha;
+        const notesString2 = await notes.releaseNotesString(after_sha, before_sha);
         const notesString = await notes.releaseNotesString(fromRef, toRef);
         // console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
