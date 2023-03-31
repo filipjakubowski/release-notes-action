@@ -9,7 +9,7 @@ async function getPRCommits() {
     throw new Error("GITHUB_TOKEN is not set");
   }
 
-  const octokit = github.getOctokit(core.getInput(process.env.GITHUB_TOKEN));
+  const octokit = github.getOctokit(core.getInput(github_token));
   const { owner, repo } = github.context.repo;
   const pull_number = github.context.payload.number;
   return octokit.pulls.listCommits({
