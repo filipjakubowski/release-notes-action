@@ -18862,7 +18862,8 @@ const github = __nccwpck_require__(5438);
 
 // most @actions toolkit packages have async methods
 async function getPRCommits() {
-  if(!process.env.GITHUB_TOKEN){
+  let github_token = core.getInput('github_token');
+  if(github_token == null || github_token == ""){
     throw new Error("GITHUB_TOKEN is not set");
   }
 
