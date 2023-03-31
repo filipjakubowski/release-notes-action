@@ -18913,7 +18913,7 @@ async function run() {
         fromRef = before_sha ? before_sha : base_sha;
 
         toRef = github.context.payload.pull_request.head.sha;
-        const notesString2 = await notes.releaseNotesString(after_sha, before_sha);
+        const notesString2 = await notes.releaseNotesString(after_sha, 'HEAD');
         const notesString = await notes.releaseNotesString(fromRef, toRef);
         // console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
