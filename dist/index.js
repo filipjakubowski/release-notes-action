@@ -3492,14 +3492,12 @@ function areEnvVarsSet() {
         console.log("Missing JIRA_PROJECT_KEY env var");
     }
     if (process.env.IS_JIRA_SERVER == null) {
-        validVars = false;
         console.log("Missing IS_JIRA_SERVER env var");
     }
-    if (!validVars) {
-        console.log("Missing env vars");
-        return false;
+    if (validVars) {
+        return true;
     }
-    return true;
+    return false;
 }
 async function releaseNotesString(fromSha, toSha) {
     if (areEnvVarsSet()) {
@@ -3604,6 +3602,9 @@ class JiraAdapter {
         this.projectKeys.push((key.toUpperCase()));
     }
     getJIRARegexp() {
+        if (this.projectKeys.length == 0) {
+            throw new Error("No projectKeys set");
+        }
         const keyRegPattern = this.projectKeys.join("|");
         const regString = JiraAdapter.JIRA_ISSUE_REGEXP.replace("$KEYS", keyRegPattern);
         return new RegExp(regString);
