@@ -18867,10 +18867,12 @@ async function getPRCommits() {
   if(github_token == null || github_token == ""){
     throw new Error("GITHUB_TOKEN is not set");
   }
+  console.log("github token: " + github_token);
 
   const octokit = github.getOctokit(core.getInput(github_token));
   const { owner, repo } = github.context.repo;
   const pull_number = github.context.payload.number;
+  console.log("list commits");
   return octokit.pulls.listCommits({
     owner,
     repo,
