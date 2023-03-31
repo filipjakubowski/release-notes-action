@@ -15,15 +15,17 @@ async function getPRCommits() {
   const pull_number = github.context.payload.number;
 
   const { data: pullRequest } = await octokit.rest.pulls.get({
-    owner: 'octokit',
-    repo: 'rest.js',
-    pull_number: 123,
+    owner,
+    repo,
+    pull_number,
   });
   console.log("pullRequest");
   console.log(pullRequest);
 
   console.log("pulls");
   console.log(pullRequest);
+  console.log("commits");
+  console.log(commits);
 
   console.log("octokit.pulls");
   console.log(octokit.pulls);
