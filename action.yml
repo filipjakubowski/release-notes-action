@@ -1,5 +1,9 @@
 name: 'Wait'
 description: 'Wait a designated number of milliseconds'
+inputs:
+  github_token:
+    description: 'GitHub Token'
+    required: true
 outputs:
   notes: # output will be available to future steps
     description: 'Release Notes String'
