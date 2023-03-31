@@ -18928,6 +18928,8 @@ async function run() {
         let commits = await getPRCommits();
         // console.log('commit');
         // console.log(commits[0]);
+        console.log("notes with commits");
+        console.log(commits);
         const notesString = await notes.releaseNotesStringFromCommits(commits);
 
         // console.log(`Release Notes Output: >${notesString}<`);
