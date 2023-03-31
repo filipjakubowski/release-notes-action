@@ -4,8 +4,10 @@ const github = require('@actions/github');
 
 // most @actions toolkit packages have async methods
 async function getPRCommits() {
-  let github_token = core.getInput('github_token');
+  let github_token = core.getInput('github-token');
   if(github_token == null || github_token == ""){
+    console.log("github_token: ");
+    console.log(github_token);
     throw new Error("GITHUB_TOKEN is not set");
   }
 
