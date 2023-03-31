@@ -1,7 +1,7 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'JIRA Release Notes'
+description: 'Preparing release notes for JIRA'
 inputs:
-  github_token:
+  github-token:
     description: 'GitHub Token'
     required: true
 outputs:
