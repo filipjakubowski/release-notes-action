@@ -6,8 +6,6 @@ const github = require('@actions/github');
 async function getPRCommits() {
   let github_token = core.getInput('github-token');
   if(github_token == null || github_token == ""){
-    console.log("github_token: ");
-    console.log(github_token);
     throw new Error("GITHUB_TOKEN is not set");
   }
 
@@ -25,16 +23,16 @@ async function run() {
   try {
     const eventName = github.context.eventName;
     console.log(`Preparing Release Notes for action: ${eventName}`);
-    console.log("Github Context");
-    console.log(`github:`);
-    console.log(github);
-    console.log(`github.ref_name: ${ github.ref_name }`);
-    console.log(`context:`);
-    console.log(github.context);
-    console.log(`--------------------------------`);
+    // console.log("Github Context");
+    // console.log(`github:`);
+    // console.log(github);
+    // console.log(`github.ref_name: ${ github.ref_name }`);
+    // console.log(`context:`);
+    // console.log(github.context);
+    // console.log(`--------------------------------`);
 
-    console.log(github.context.payload.after);
-    console.log(github.context.payload.pull_request.base.sha);
+    // console.log(github.context.payload.after);
+    // console.log(github.context.payload.pull_request.base.sha);
 
     // let fromRef = "";
     // let toRef = "";
