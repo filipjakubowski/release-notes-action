@@ -10,7 +10,7 @@ async function getPRCommits() {
   }
   console.log("github token: " + github_token);
 
-  const octokit = github.getOctokit(core.getInput(github_token));
+  const octokit = github.getOctokit(github_token);
   const { owner, repo } = github.context.repo;
   const pull_number = github.context.payload.number;
   console.log("list commits");
