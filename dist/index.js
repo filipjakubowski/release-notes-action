@@ -18861,6 +18861,21 @@ const notes =  __nccwpck_require__(3752);
 const github = __nccwpck_require__(5438);
 
 // most @actions toolkit packages have async methods
+async function getPRCommits() {
+  if(!process.env.GITHUB_TOKEN){
+    throw new Error("GITHUB_TOKEN is not set");
+  }
+
+  const octokit = github.getOctokit(core.getInput(process.env.GITHUB_TOKEN));
+  const { owner, repo } = github.context.repo;
+  const pull_number = github.context.payload.number;
+  return octokit.pulls.listCommits({
+    owner,
+    repo,
+    pull_number,
+  });
+}
+
 async function run() {
   try {
     const eventName = github.context.eventName;
@@ -18874,20 +18889,10 @@ async function run() {
     console.log(`--------------------------------`);
 
     console.log(github.context.payload.after);
-    console.log(github.context.payload.pull_request.base.sha)
+    console.log(github.context.payload.pull_request.base.sha);
 
-    const args = ["log", "--format=oneline", `${github.context.payload.pull_request.base.ref}..${github.context.payload.pull_request.head.ref}`];
-
-    try{
-      await exec.exec("git", args);
-    }
-    catch (error){
-      console.log("Error while git log. ");
-      console.log(error);
-    }
-
-    let fromRef = "";
-    let toRef = "";
+    // let fromRef = "";
+    // let toRef = "";
 
     switch(eventName){
       case 'push':{
@@ -18899,22 +18904,28 @@ async function run() {
         break;
       }
       case 'pull_request':{
-        console.log("\----------BASE-------------")
-        console.log(github.context.payload.pull_request.base);
-        console.log("\----------HEAD-------------")
-        console.log(github.context.payload.pull_request.head);
-        console.log(github.context.payload.before);
-        console.log("-----------------");
+        // console.log("\----------BASE-------------")
+        // console.log(github.context.payload.pull_request.base);
+        // console.log("\----------HEAD-------------")
+        // console.log(github.context.payload.pull_request.head);
+        // console.log(github.context.payload.before);
+        // console.log("-----------------");
+        //
+        // let base_sha =  github.context.payload.pull_request.base.sha;
+        // let before_sha = github.context.payload.before;
+        // let after_sha = github.context.payload.before;
+        //
+        // fromRef = before_sha ? before_sha : base_sha;
+        //
+        // toRef = github.context.payload.pull_request.head.sha;
+        // const notesString2 = await notes.releaseNotesString(after_sha, 'HEAD');
+        // const notesString = await notes.releaseNotesString(fromRef, toRef);
 
-        let base_sha =  github.context.payload.pull_request.base.sha;
-        let before_sha = github.context.payload.before;
-        let after_sha = github.context.payload.before;
+        let commits = await getPRCommits();
+        // console.log('commit');
+        // console.log(commits[0]);
+        const notesString = await notes.releaseNotesStringFromCommits(commits);
 
-        fromRef = before_sha ? before_sha : base_sha;
-
-        toRef = github.context.payload.pull_request.head.sha;
-        const notesString2 = await notes.releaseNotesString(after_sha, 'HEAD');
-        const notesString = await notes.releaseNotesString(fromRef, toRef);
         // console.log(`Release Notes Output: >${notesString}<`);
         core.setOutput('notes', notesString);
         break;
