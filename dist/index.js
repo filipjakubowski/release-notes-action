@@ -18884,7 +18884,7 @@ async function getPRCommits() {
   console.log("pulls");
   console.log(pullRequest);
   console.log("commits");
-  console.log(commits);
+  console.log(pullRequest.commits);
 
   console.log("octokit.pulls");
   console.log(octokit.pulls);
@@ -18947,6 +18947,7 @@ async function run() {
         // console.log(commits[0]);
         console.log("notes with commits");
         console.log(commits);
+
         const notesString = await notes.releaseNotesStringFromCommits(commits);
 
         // console.log(`Release Notes Output: >${notesString}<`);
