@@ -18873,18 +18873,15 @@ async function getPRCommits() {
   const { owner, repo } = github.context.repo;
   const pull_number = github.context.payload.number;
 
-  // const { data: pullRequest } = await octokit.rest.pulls.get({
-  //   owner,
-  //   repo,
-  //   pull_number,
-  // });
-
 
   let commits = await octokit.rest.pulls.listCommits({
     owner,
     repo,
     pull_number,
   });
+
+  console.log("selected commit: ");
+  console.log(commits.data[0].commit);
 
   return commits;
 }
