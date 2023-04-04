@@ -18880,16 +18880,11 @@ async function getPRCommits() {
   // });
 
 
-  let commits = octokit.rest.pulls.listCommits({
+  let commits = await octokit.rest.pulls.listCommits({
     owner,
     repo,
     pull_number,
   });
-
-
-  console.log("commits");
-  console.log(commits);
-
 
   return commits;
 }
